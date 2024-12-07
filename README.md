@@ -6,7 +6,7 @@ Reverse Engineering ASC is not a horrendous task. Also, ASC, being old as f***, 
 
 ## Setup
 
-**Step 0:** Make sure you are connected to the IITB Network or use [OpenVPn](https://www.cc.iitb.ac.in/page/services-vpnssh), or you'll be bombarded with SSO Landing page captchas...
+**Step 0:** Make sure you are connected to the IITB Network or use [OpenVPn](https://www.cc.iitb.ac.in/page/services-vpnssh), or you'll be bombarded with SSO Landing page captchas. You can dare if you're feeling lucky...
 
 **Step 1:** Clone the repository onto your local machine.
 ```bash
