@@ -8,10 +8,11 @@ Reverse Engineering ASC is not a horrendous task. Also, ASC being old as f*** do
 
 **Step 0:** Make sure you are connected to the IITB Network or use [OpenVPN](https://www.cc.iitb.ac.in/page/services-vpnssh), or you'll be bombarded with SSO Landing page captchas. You can dare if you're feeling lucky...
 
-**Step 1:** Clone the repository onto your local machine.
+**Step 1:** Clone the repository onto your local machine, and install the dependencies.
 ```bash
 git clone https://github.com/sudo-boo/asc0.git
 cd asc0
+pip install -r requirements.txt
 ```
 
 
