@@ -1,3 +1,33 @@
 # asc0
 
-I'm doing this project just because I can. I wanted instant notifications of the registration portal status on IITB ASC as soon as it opens. Reverse Engineering ASC is not a horendeous task. Also, ASC being age as f***, doesn't as such have any firewall or rate limiter, except for the SSO landing page which it asks for non-IITB network users. So, yeah here it is. I'm thinking to expand it for scraping grades, etc further. But, eh... a bit of an overkill for a shitty website
+This project is just to pass time in Winters... I'm doing this project just because I can... 
+
+Reverse Engineering ASC is not a horrendous task. Also, ASC, being old as f***, doesn't have any firewall or rate limiter, except for the SSO landing page, which asks for non-IITB network users.  
+
+## Setup
+
+**Step 0:** Make sure you are connected to the IITB Network or use [OpenVPn](https://www.cc.iitb.ac.in/page/services-vpnssh), or you'll be bombarded with SSO Landing page captchas...
+
+**Step 1:** Clone the repository onto your local machine.
+```bash
+git clone https://github.com/sudo-boo/asc0.git
+cd asc0
+```
+
+
+**Step 2:** Run
+```bash
+python setup.py
+```
+This creates a `.env` file with your login credentials for ASC.
+
+> [!IMPORTANT]   
+> This does not share your credentials anywhere except your local machine. So, you're cool.!
+
+**Step 3:** Run
+```bash
+python main.py
+```
+This creates various output directories, scrapes the ASC webpage, generates `logs`, and periodically sends emails on your mentioned email about the updates. 
+
+### Yepp... That's it...!!
