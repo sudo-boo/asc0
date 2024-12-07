@@ -24,7 +24,7 @@ This creates a `.env` file with your login credentials for ASC.
 > [!IMPORTANT]   
 > This does not share your credentials anywhere except your local machine. So, you're cool.!
 
-**Step 3:** Run
+**Step 3:** Run the main script.
 ```bash
 python main.py
 ```
