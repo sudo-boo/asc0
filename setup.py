@@ -1,10 +1,12 @@
-# setup.py
+#s etup.py
 
-from utils import print_warning, get_info, save_to_env
+import sys
+from utils import print_warning, get_info_from_user, save_to_env, cleanup
 
-# Main program execution
 if __name__ == '__main__':
-    print_warning()
-    user_info = get_info()
-    save_to_env(user_info)
-    
+    if '--clean' in sys.argv:
+        cleanup()
+    else:
+        print_warning()
+        user_info = get_info_from_user()
+        save_to_env(user_info)
