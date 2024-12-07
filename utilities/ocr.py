@@ -1,7 +1,7 @@
 import logging
 import pytesseract
 from PIL import Image
-from utils import print_log
+from utilities.utils import print_log
 from datetime import datetime as time
 
 # Set logging to show only errors (suppress debug/info/warnings)

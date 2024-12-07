@@ -1,4 +1,4 @@
-from utils import *
+from utilities.utils import *
 from time import sleep
 from utilities.ocr import perform_ocr
 from datetime import datetime, timedelta
@@ -12,12 +12,17 @@ URL = "https://asc.iitb.ac.in/acadmenu/"
 TRIM_PIXELS = [250, 20, 0, 0]
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 800
+
 DELAY_MULTIPLIER = 1.0
 NUM_EXCEEDS = 0
-TIMESTAMPS = []
+
+ERRORS = []
+
 EXECUTION_TIME_THRESHOLD_HARD = 90
 EXECUTION_TIME_THRESHOLD_SOFT = 30
+TIMESTAMPS = []
 EXECUTION_TIMES = []
+
 
 def session_login(driver, user_info):
     # Switch to the rightPage frame
@@ -35,8 +40,8 @@ def session_login(driver, user_info):
         print_log("Password entered...", "info")
         sleep(0.5 * DELAY_MULTIPLIER)
         password_element.send_keys(Keys.RETURN)
+        print_log(f"{green}Log in successfully...{reset}", "info")
         sleep(2 * DELAY_MULTIPLIER)
-        print_log(f"{green}Logged in successfully...{reset}", "info")
         return driver
     except Exception as e:
         print_log(f"{red}An error occurred while logging in: {e}{reset}", "error")
@@ -64,7 +69,7 @@ def compare_ocr_outputs(file1, file2):
     return True
 
 def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
-    global TIMESTAMPS
+    global TIMESTAMPS, ERRORS
     
     print()
     print_log("=====================================================================================================")
@@ -143,22 +148,27 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
             if not compare_ocr_outputs(latest_ocr_output, current_ocr_output):
                 print_log(f"{red}DIFF SPOTTED: OCR outputs are different! Sending an email...{reset}", "warn")
                 attachment_paths = [get_image_path_by_timestamp(latest_timestamp), get_image_path_by_timestamp(time_stamp)]
-                send_email_with_attachment(time_stamp, attachment_paths)
+                if 'execution_times.png' in os.listdir():
+                    attachment_paths.append('execution_times.png')
+                send_email_with_attachment("New OCR Output", f"Found different OCR output. Please check the Details.", time_stamp, attachment_paths)
             else:
                 print_log(f"{green}OCR outputs are the same!{reset}", "info")
 
         TIMESTAMPS.append(time_stamp)
         print_log(f"{green}Session {session_number} completed successfully!{reset}", "info")
         print_log("=====================================================================================================\n")
+        ERRORS = []
+        driver.quit()
+        return True
 
     except Exception as e:
         print_log(f"An error occurred: {e}", "error")
-        timestamp = datetime.now().strftime("%Y%m%d_%H_%M_%S")
-        driver.save_screenshot(f'error_screenshot_{timestamp}.png')
-        
-    finally:
+        time_stamp = time_stamp.strftime("%Y%m%d_%H_%M_%S")
+        error_img_path = get_error_output_path_by_timestamp(time_stamp)
+        driver.save_screenshot(error_img_path)
+        ERRORS.append((error_img_path, e, time_stamp))
         driver.quit()
-
+        return False
 
 def setup():
     print_log("=====================================================================================================")
@@ -179,7 +189,7 @@ def setup():
 
 
 def scheduler():
-    global DELAY_MULTIPLIER, NUM_EXCEEDS, EXECUTION_TIMES
+    global DELAY_MULTIPLIER, NUM_EXCEEDS, EXECUTION_TIMES, ERRORS
     print_log(f"{yellow}Current time is \t{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{reset}")
     
     now = datetime.now()
@@ -192,30 +202,33 @@ def scheduler():
         now = datetime.now()
         if now >= next_run:
             start = datetime.now()
-            # session(session_number, DELAY_MULTIPLIER, user_info, next_run)
-            sleep(10)
-            if session_number == 1:
-                sleep(2)
-            if session_number == 2:
-                sleep(5)
-            if session_number == 3:
-                sleep(1)
+            result = session(session_number, DELAY_MULTIPLIER, user_info, next_run)
             end = datetime.now()
             execution_time = end - start
             if execution_time.total_seconds() > EXECUTION_TIME_THRESHOLD_HARD or NUM_EXCEEDS > 20:
                 print_log(f"{red}Execution took too long: {execution_time} seconds{reset}", "error")
-                send_TLE_email()
+                attachments = []
+                if 'execution_times.png' in os.listdir():
+                    attachments.append('execution_times.png')
+
+                send_email_with_attachment("Execution took too long", f"Execution took {execution_time} seconds", 
+                                                    next_run.strftime('%Y-%m-%d %H:%M:%S'), attachments)
+                print_log(f"{red}Exiting...{reset}", "error")
                 break
-            elif execution_time.total_seconds() > EXECUTION_TIME_THRESHOLD_SOFT:
-                print_log(f"{red}Execution took longer than expected: {execution_time} seconds{reset}", "warn")
-                DELAY_MULTIPLIER = (NUM_EXCEEDS + 1) ** 0.25
+            elif execution_time.total_seconds() > EXECUTION_TIME_THRESHOLD_SOFT or not result:
+                print_log(f"{red}Execution wrong or took longer than expected: {execution_time} seconds{reset}", "warn")
                 NUM_EXCEEDS += 1
+                DELAY_MULTIPLIER = (NUM_EXCEEDS + 1) ** 0.35
+                print_log(f"{yellow}Delay multiplier set to {DELAY_MULTIPLIER}, NUM_EXCEEDS = {NUM_EXCEEDS}{reset}")
             else:
                 print_log(f"Execution time was normal: {execution_time} seconds{reset}", "info")
                 DELAY_MULTIPLIER = 1.0
                 NUM_EXCEEDS = 0
             
             print_log(f"Session {session_number} completed in {end - start} seconds.")
+            print_log("=====================================================================================================")
+            print()
+            
             session_number += 1
             
             # Calculate the next valid run time based on the current time
@@ -226,12 +239,21 @@ def scheduler():
             
             EXECUTION_TIMES.append(execution_time.total_seconds())
             plot_execution_times()
+
+            if len(ERRORS) % 5 == 0 and len(ERRORS) > 0:
+                attachment_paths = [error[0] for error in ERRORS]
+                if 'execution_times.png' in os.listdir():
+                    attachment_paths.append('execution_times.png')
+                timestamps = [error[2] for error in ERRORS]
+                # convert list of timestamps to string
+                time_stamps = ', '.join(timestamps)
+                send_email_with_attachment("Errors in the last 5 sessions", f"Found {len(ERRORS)} errors in the last {session_number} sessions. Please check the Details.", 
+                                            time_stamps, attachment_paths)
             
             print_log(f"{yellow}Current time is \t{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}{reset}")
             print_log(f"{yellow}Next run will be at \t{next_run.strftime('%Y-%m-%d %H:%M:%S')}{reset}")
-            print()
         else:
-            sleep(1)  # Sleep for a short interval to avoid busy waiting
+            sleep(1)
 
 
 if __name__ == '__main__':

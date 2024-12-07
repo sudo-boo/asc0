@@ -1,3 +1,3 @@
 # asc0
 
-Some cheats to IITB ASC
+I'm doing this project just because I can. I wanted instant notifications of the registration portal status on IITB ASC as soon as it opens. Reverse Engineering ASC is not a horendeous task. Also, ASC being age as f***, doesn't as such have any firewall or rate limiter, except for the SSO landing page which it asks for non-IITB network users. So, yeah here it is. I'm thinking to expand it for scraping grades, etc further. But, eh... a bit of an overkill for a shitty website
