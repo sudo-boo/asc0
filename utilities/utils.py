@@ -16,6 +16,9 @@ def get_image_path_by_timestamp(timestamp):
 def get_ocr_output_path_by_timestamp(timestamp):
     return f"outputs/ocr/reg_page_{timestamp}_ocr.txt"
 
+def get_error_output_path_by_timestamp(timestamp):
+    return f"outputs/error/reg_page_{timestamp}_error.png"
+
 def print_log(message, level="info"):
     from datetime import datetime as dt
     """
@@ -45,6 +48,8 @@ def create_output_dirs():
         os.makedirs('outputs/ss')
     if not os.path.exists('outputs/ocr'):
         os.makedirs('outputs/ocr')
+    if not os.path.exists('outputs/error'):
+        os.makedirs('outputs/error')
 
 def get_details_from_env_file():
     """
@@ -107,24 +112,21 @@ def save_to_env(user_info):
         print(f"====================================================================================================={reset}")
 
 # delete .env file and outputs directory
-
 def cleanup():
     # Remove .env file if it exists
     if os.path.exists('.env'):
         os.remove('.env')
         print_log(f".env file has been deleted successfully.")
 
-    # Cleaning up the outputs directory
-    print_log("Cleaning up the outputs directory...")
     if os.path.exists('outputs'):
-        shutil.rmtree('outputs')  # Use shutil.rmtree to remove the 'outputs' directory and all its contents
+        shutil.rmtree('outputs')
         print_log("'outputs' directory and its contents have been deleted successfully.")
 
     # Also clean __pycache__ directories in all subdirectories
     for root, dirs, files in os.walk('.', topdown=True):
         if '__pycache__' in dirs:
             pycache_dir = os.path.join(root, '__pycache__')
-            shutil.rmtree(pycache_dir)  # Remove non-empty __pycache__ directory
+            shutil.rmtree(pycache_dir)
             print_log(f"'{pycache_dir}' directory and its contents have been deleted successfully.")
 
     print_log(f"{green}Cleanup completed successfully...{reset}")

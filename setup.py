@@ -1,7 +1,7 @@
 #s etup.py
 
 import sys
-from utils import print_warning, get_info_from_user, save_to_env, cleanup
+from utilities.utils import print_warning, get_info_from_user, save_to_env, cleanup
 
 if __name__ == '__main__':
     if '--clean' in sys.argv:

@@ -6,12 +6,13 @@ from email import encoders
 import os
 from utilities.utils import print_log, red, green, reset, get_details_from_env_file
 
-def send_email_with_attachment(subject_type, body_text, time_stamp, attachment_paths):
+def send_email_with_attachment(time_stamp, attachment_paths):
     try:
         # Create the email
-        subject = "ASC ALERT: " + subject_type
-        body = f" Last Updated : {time_stamp}\n"
-        body += body_text
+        subject = "ASC ALERT: New OCR Output"
+        body = f'''Found different OCR output. Please check the Details.
+        Last Updated : {time_stamp}
+        '''
         user_info = get_details_from_env_file()
         sender_email = "merlinsbrownbeard@gmail.com"
         sender_password = "pmmt hybl jcnj aqyr"
