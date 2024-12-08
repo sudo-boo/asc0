@@ -10,6 +10,11 @@ green = '\033[92m'
 yellow = '\033[93m'
 reset = '\033[0m'
 
+def check_email(email):
+    if '@' in email and '.' in email:
+        return True
+    return False
+
 def get_image_path_by_timestamp(timestamp):
     return f"outputs/ss/reg_page_{timestamp}.png"
 
@@ -84,10 +89,6 @@ def print_warning():
 
 # Function to prompt the user for their details (roll number, password, phone, and email)
 def get_info_from_user():
-    def check_email(email):
-        if '@' in email and '.' in email:
-            return True
-        return False
         
     roll = input("Enter your Roll Number: ")
     password = input("Enter your Password: ")
@@ -131,3 +132,48 @@ def cleanup():
 
     print_log(f"{green}Cleanup completed successfully...{reset}")
     print_log("=====================================================================================================")
+
+# Function to setup the sender email
+def setup_sender():
+    print_log(f"=====================================================================================================")
+    print_log(f"{yellow}You need to provide the email and password of the sender account.{reset}", "warn")
+    print_log(f"{yellow}Generate an app password for your email account and use that here.{reset}", "warn")
+    print_log(f"{yellow}For a Gmail account, visit https://myaccount.google.com/apppasswords {reset}", "warn")
+    print_log(f"=====================================================================================================")
+    email = input("Enter your Email Address: ")
+    while not check_email(email):
+        print("Please enter a valid email address.")
+        email = input("Enter your Email Address: ")
+    password = input("Enter your Password: ")
+    password_confirm = input("Confirm your Password: ")
+    while password != password_confirm:
+        print("Passwords do not match. Please try again.")
+        password = input("Enter your Password: ")
+        password_confirm = input("Confirm your Password: ")
+
+    with open('.sender', 'w') as f:
+        f.write(f"SENDER_EMAIL={email}\n")
+        f.write(f"SENDER_PASSWORD={password}\n")
+        print(f"{green}=====================================================================================================")
+        print(f"Sender information saved successfully!")
+        print(f"====================================================================================================={reset}")
+
+# Function to get the sender email and password from the .sender file
+def get_sender_details():
+    if not os.path.exists('.sender'):
+        print_log("The file .sender is not present in the current directory. Run the setup.py file to create the file.", "error")
+        print_log(f"{yellow}Please run 'python setup.py --sender' to create the .sender file.{reset}", "error")
+        print_log("=====================================================================================================", "error")
+        return None, None
+    
+    try:
+        with open('.sender', 'r') as f:
+            lines = f.readlines()
+            SENDER_EMAIL = lines[0].split('=')[1].strip()
+            SENDER_PASSWORD = lines[1].split('=')[1].strip()
+
+            return SENDER_EMAIL, SENDER_PASSWORD
+    except Exception as e:
+        print_log(f"{red}Error reading .sender file: {e}", "error")
+        print_log(f"Please check the contents of the .sender file created using setup.py and try again.{reset}", "error")
+        return None, None

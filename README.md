@@ -15,27 +15,30 @@ cd asc0
 pip install -r requirements.txt
 ```
 
+**Step 2:** Run the `setup.py` script to configure your environment:
 
-**Step 2:** Run
 ```bash
-python setup.py
+python setup.py [--user | --sender | --clean]
 ```
-This creates a `.env` file with your login credentials for ASC.
+
+**Available options:**
+
+- `--user`: Creates a `.env` file locally containing your login info for ASC.
+- `--sender`: Creates a `.sender` file locally containing the sender email and login password.
+- `--clean`: Cleans up any previously stored configurations or user data.
+
 
 > [!IMPORTANT]   
 > This does not share your credentials anywhere except your local machine. So, you're cool.!
 
-**Step 3:** Run the main script.
+
+**Step 3:** Run the `main.py` script.
+
 ```bash
 python main.py
 ```
 This creates various output directories, scrapes the ASC webpage, generates `logs`, and periodically sends emails on your mentioned email about the updates. 
 
-### Clear the generated files
-```bash
-python setup.py --clean
-```
-Clears the `.env`, output files, and pycache.
+<hr>
 
-
-### Yepp... That's it...!!
+### And yepp... That's it...!!
