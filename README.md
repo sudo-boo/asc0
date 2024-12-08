@@ -1,6 +1,6 @@
 # asc0
 
-This project is just to pass the time in Winters... I'm doing this project just because I can... 
+I'm just doing this project to kill time over the winters, and honestly, I'm doing it because I can.
 
 Reverse Engineering ASC is not a horrendous task. Also, ASC being shit as f*** doesn't have any firewall or rate limiter, except for the SSO landing page, which is asked for non-IITB network users.  
 
