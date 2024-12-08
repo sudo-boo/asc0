@@ -15,8 +15,6 @@ cd asc0
 pip install -r requirements.txt
 ```
 
-
-
 **Step 2:** Run the `setup.py` script to configure your environment:
 
 ```bash
@@ -35,10 +33,12 @@ python setup.py [--user | --sender | --clean]
 
 
 **Step 3:** Run the `main.py` script.
+
 ```bash
 python main.py
 ```
 This creates various output directories, scrapes the ASC webpage, generates `logs`, and periodically sends emails on your mentioned email about the updates. 
 
+<hr>
 
 ### And yepp... That's it...!!
