@@ -31,4 +31,11 @@ python main.py
 ```
 This creates various output directories, scrapes the ASC webpage, generates `logs`, and periodically sends emails on your mentioned email about the updates. 
 
+### Clear the generated files
+```bash
+python setup.py --clean
+```
+Clears the `.env`, output files, and pycache.
+
+
 ### Yepp... That's it...!!
