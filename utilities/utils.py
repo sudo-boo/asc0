@@ -119,6 +119,10 @@ def cleanup():
         os.remove('.env')
         print_log(f".env file has been deleted successfully.")
 
+    if os.path.exists('.sender'):
+        os.remove('.sender')
+        print_log(f".sender file has been deleted successfully.")
+
     if os.path.exists('outputs'):
         shutil.rmtree('outputs')
         print_log("'outputs' directory and its contents have been deleted successfully.")
