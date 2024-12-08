@@ -4,7 +4,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import os
-from utilities.utils import print_log, red, green, reset, get_details_from_env_file
+from utilities.utils import *
 
 def send_email_with_attachment(subject_type, body_text, time_stamp, attachment_paths):
     try:
@@ -13,8 +13,7 @@ def send_email_with_attachment(subject_type, body_text, time_stamp, attachment_p
         body = f" Last Updated : {time_stamp}\n"
         body += body_text
         user_info = get_details_from_env_file()
-        sender_email = "merlinsbrownbeard@gmail.com"
-        sender_password = "pmmt hybl jcnj aqyr"
+        sender_email, sender_password = get_sender_details()
         recepient_email = user_info.get_email()
         msg = MIMEMultipart()
         msg['From'] = sender_email
