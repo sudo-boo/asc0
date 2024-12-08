@@ -1,4 +1,5 @@
 .env
+.sender
 *.png
 *.html
 *.txt
