@@ -25,9 +25,13 @@ Reverse Engineering ASC is not a horrendous task. Also, ASC being shit as f*** d
   ```
   
   **Available options:**
+
+  > **NOTE:** `--user` and `--sender` are mandatory.
   
   - `--user`: Creates a `.env` file locally containing your login info for ASC.
   - `--sender`: Creates a `.sender` file locally containing the sender email and login password.
+    
+    You'll need to create the app password for the email. For Gmail (preferred): Visit [this](https://support.google.com/mail/answer/185833)
   - `--clean`: Cleans up any previously stored configurations or user data.
 
 - **Step 3:** Run the `main.py` script.
