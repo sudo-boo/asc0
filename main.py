@@ -6,6 +6,7 @@ from selenium import webdriver
 from utilities.email_engine import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support import expected_conditions as EC
 
 URL = "https://asc.iitb.ac.in/acadmenu/"
@@ -13,7 +14,7 @@ TRIM_PIXELS = [250, 20, 0, 0]
 WINDOW_WIDTH = 1024
 WINDOW_HEIGHT = 800
 
-DELAY_MULTIPLIER = 1.0
+DELAY_MULTIPLIER = 1.2
 NUM_EXCEEDS = 0
 
 ERRORS = []
@@ -86,7 +87,13 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
 
     print_log(f"{yellow}Opening the browser and navigating to {URL}...{reset}")
 
-    driver = webdriver.Chrome()
+    # Set up Chrome options for headless mode
+    options = Options()
+    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--disable-gpu")  # Disable GPU acceleration (needed for headless mode)
+    options.add_argument("--no-sandbox")  # Disable sandboxing (needed in certain environments)
+    
+    driver = webdriver.Chrome(options=options)
     driver.set_window_size(WINDOW_WIDTH, WINDOW_HEIGHT)
     print_log(f"Window size set to {WINDOW_WIDTH}x{WINDOW_HEIGHT}")
 
@@ -218,7 +225,7 @@ def scheduler():
             elif execution_time.total_seconds() > EXECUTION_TIME_THRESHOLD_SOFT or not result:
                 print_log(f"{red}Execution wrong or took longer than expected: {execution_time} seconds{reset}", "warn")
                 NUM_EXCEEDS += 1
-                DELAY_MULTIPLIER = (NUM_EXCEEDS + 1) ** 0.35
+                DELAY_MULTIPLIER = (NUM_EXCEEDS + 1) ** 0.80
                 print_log(f"{yellow}Delay multiplier set to {DELAY_MULTIPLIER}, NUM_EXCEEDS = {NUM_EXCEEDS}{reset}")
             else:
                 print_log(f"Execution time was normal: {execution_time} seconds{reset}", "info")
