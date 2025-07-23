@@ -1,3 +1,5 @@
+import numpy as np
+import sounddevice as sd
 from utilities.utils import *
 from time import sleep
 from utilities.ocr import perform_ocr
@@ -69,6 +71,13 @@ def compare_ocr_outputs(file1, file2):
                 return False
     return True
 
+def play_sound(duration=1, freq=940):
+    fs = 44100  # sampling rate
+    t = np.linspace(0, duration, int(fs * duration), False)
+    tone = np.sin(freq * 2 * np.pi * t)
+    sd.play(tone, samplerate=fs)
+    sd.wait()
+
 def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
     global TIMESTAMPS, ERRORS
     
@@ -89,9 +98,9 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
 
     # Set up Chrome options for headless mode
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode
-    options.add_argument("--disable-gpu")  # Disable GPU acceleration (needed for headless mode)
-    options.add_argument("--no-sandbox")  # Disable sandboxing (needed in certain environments)
+    # options.add_argument("--headless")  # Run in headless mode
+    # options.add_argument("--disable-gpu")  # Disable GPU acceleration (needed for headless mode)
+    # options.add_argument("--no-sandbox")  # Disable sandboxing (needed in certain environments)
     
     driver = webdriver.Chrome(options=options)
     driver.set_window_size(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -101,7 +110,7 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
         driver.get(URL)
 
         # Wait for the frameset to be loaded
-        sleep(2 * delay_multiplier)
+        sleep(1 * delay_multiplier)
         
         driver = session_login(driver, user_info)
         if driver is None:
@@ -120,6 +129,7 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
         print_log("Clicked on 'Academic'...", "debug")
         sleep(0.5)
 
+        # Expand the "Registrations" node to reveal "Registration/Adjustment"
         registrations_link = driver.find_element(By.XPATH, "//a[contains(text(), 'Registration')]")
         driver.execute_script("arguments[0].click();", registrations_link)
         print_log("Clicked on 'Registrations'...", "debug")
@@ -129,11 +139,13 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
         driver.execute_script("arguments[0].click();", sub_reg_link)
         print_log("Clicking on 'Registration/Adjustment'...", "debug")
 
-        sleep(1.5 * delay_multiplier)
+        sleep(0.5 * delay_multiplier)
 
         driver.switch_to.default_content()
         frame = driver.find_element(By.NAME, "rightPage")
         driver.switch_to.frame(frame)
+        
+        sleep(1 * delay_multiplier)
 
         time_stamp = time_stamp.strftime("%Y%m%d_%H_%M_%S")
         # save in subdirectory
@@ -153,10 +165,14 @@ def session(session_number, delay_multiplier, user_info=None, time_stamp=None):
             latest_ocr_output = get_ocr_output_path_by_timestamp(latest_timestamp)
             current_ocr_output = get_ocr_output_path_by_timestamp(time_stamp)
             if not compare_ocr_outputs(latest_ocr_output, current_ocr_output):
-                print_log(f"{red}DIFF SPOTTED: OCR outputs are different! Sending an email...{reset}", "warn")
+                print_log(f"{red}====================================================================================================={reset}", "warn")
+                print_log(f"{red}DIFF SPOTTED: OCR OUTPUTS ARE DIFFERENT! Sending an email...{reset}", "warn")
+                print_log(f"{red}====================================================================================================={reset}", "warn")
                 attachment_paths = [get_image_path_by_timestamp(latest_timestamp), get_image_path_by_timestamp(time_stamp)]
                 if 'execution_times.png' in os.listdir():
                     attachment_paths.append('execution_times.png')
+                # make sound for 10 seconds
+                play_sound(10)
                 send_email_with_attachment("New OCR Output", f"Found different OCR output. Please check the Details.", time_stamp, attachment_paths)
             else:
                 print_log(f"{green}OCR outputs are the same!{reset}", "info")
